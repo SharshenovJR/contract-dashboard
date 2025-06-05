@@ -17,7 +17,6 @@ function App() {
   const [dateTableData, setDateTableData] = useState([]);
   const [statusTableData, setStatusTableData] = useState([]);
 
-  // Single selected category/index for pie
   const [selectedDateCategory, setSelectedDateCategory] = useState(null);
   const [activeDatePieIndex, setActiveDatePieIndex] = useState(null);
   const [selectedStatusCategory, setSelectedStatusCategory] = useState(null);
@@ -60,12 +59,10 @@ function App() {
     loadInitialData();
   }, []);
 
-   // Single-select for pie by date
    const handleDateSliceClick = useCallback((categoryName, index) => {
        if (selectedDateCategory === categoryName) {
            setSelectedDateCategory(null);
            setActiveDatePieIndex(null);
-           // Show all if unselected
            fetchDateStatsTable(null).then(data => setDateTableData(data || []));
        } else {
            setSelectedDateCategory(categoryName);

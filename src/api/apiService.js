@@ -32,24 +32,9 @@ export const fetchDateStatsPie = async () => {
 };
 
 export const fetchDateStatsTable = async (category) => {
-    let param;
-    switch (category) {
-        case 'Контракты завершены раньше срока':
-            param = 'Завершен раньше срока';
-            break;
-        case 'Контракты завершены вовремя':
-            param = 'Завершен вовремя';
-            break;
-        case 'Контракты завершены позже срока':
-            param = 'Завершен позже срока';
-            break;
-        default:
-            param = category;
-    }
-    
    let url = DATE_STATS_TABLE_URL;
    if (category) {
-       url = `${url}?category=${encodeURIComponent(param)}`;
+       url = `${url}?category=${encodeURIComponent(category)}`;
    }
    return fetchData(url);
 };
@@ -59,21 +44,9 @@ export const fetchStatusStatsPie = async () => {
 };
 
 export const fetchStatusStatsTable = async (category) => {
-    let param;
-    switch (category) {
-        case 'Завершенные контракты':
-            param = 'Завершенный';
-            break;
-        case 'Текущие контракты':
-            param = 'Текущий';
-            break;
-        default:
-            param = category;
-    }
-
     let url = STATUS_STATS_TABLE_URL;
     if (category) {
-        url = `${url}?category=${encodeURIComponent(param)}`;
+        url = `${url}?category=${encodeURIComponent(category)}`;
     } 
    return fetchData(url);
 };

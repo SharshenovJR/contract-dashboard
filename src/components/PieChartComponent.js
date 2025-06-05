@@ -91,7 +91,7 @@ const PieChartComponent = ({ data, onSliceClick, activeIndex }) => {
               <Cell
                 key={`cell-${index}`}
                 fill={entry.color}
-                onClick={() => onSliceClick(entry.name, index)}
+                onClick={() => onSliceClick(entry.status, index)}
               />
             ))}
           </Pie>
