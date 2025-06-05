@@ -2,15 +2,38 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Sector } fro
 
 const CustomLegend = ({ payload }) => {
   return (
-    <ul className="chart-legend">
-      {
-        payload.map((entry, index) => (
-          <li key={`legend-${index}`} style={{ color: entry.color }}>
-            <span className="legend-color" style={{ backgroundColor: entry.color }}></span>
-            {entry.value}
-          </li>
-        ))
-      }
+    <ul className="chart-legend" style={{
+      display: 'flex',
+      gap: '32px',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      listStyle: 'none',
+      margin: 0,
+      padding: 0,
+      fontSize: '1.08rem',
+      fontWeight: 500
+    }}>
+      {payload.map((entry, index) => (
+        <li key={`legend-${index}`} style={{
+          color: entry.color,
+          display: 'flex',
+          alignItems: 'center',
+          transition: 'color 0.2s',
+          cursor: 'pointer',
+        }}>
+          <span className="legend-color" style={{
+            display: 'inline-block',
+            width: 14,
+            height: 14,
+            borderRadius: '50%',
+            backgroundColor: entry.color,
+            marginRight: 8,
+            border: '2px solid #fff',
+            boxShadow: '0 0 2px #aaa',
+          }}></span>
+          {entry.value}
+        </li>
+      ))}
     </ul>
   );
 }
@@ -32,7 +55,7 @@ const PieChartComponent = ({ data, onSliceClick, activeIndex }) => {
   const renderActiveShape = (props) => {
     const {
       cx, cy, innerRadius, outerRadius, startAngle, endAngle,
-      fill, payload, percent, value
+      fill
     } = props;
     return (
       <g>
@@ -45,12 +68,6 @@ const PieChartComponent = ({ data, onSliceClick, activeIndex }) => {
           endAngle={endAngle}
           fill={fill}
         />
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill} fontWeight="bold">
-          {payload.name}
-        </text>
-        <text x={cx} y={cy} dy={24} textAnchor="middle" fill="#333">
-          {`${value} (${(percent * 100).toFixed(0)}%)`}
-        </text>
       </g>
     );
   };

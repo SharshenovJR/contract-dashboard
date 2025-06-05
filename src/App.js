@@ -74,7 +74,6 @@ function App() {
        }
    }, [selectedDateCategory]);
 
-   // Single-select for pie by status
    const handleStatusSliceClick = useCallback((categoryName, index) => {
        if (selectedStatusCategory === categoryName) {
            setSelectedStatusCategory(null);
