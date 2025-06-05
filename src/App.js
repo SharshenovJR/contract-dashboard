@@ -133,7 +133,7 @@ function App() {
                    activeIndex={activeDatePieIndex}
                 />
             </Widget>
-            <Widget title={`Статистика контрактов по дате${selectedDateCategory ? `: ${selectedDateCategory}` : ''}`}>
+            <Widget title={`Статистика контрактов по дате${selectedDateCategory ? `: ${datePieData.find(d => d.status === selectedDateCategory)?.name || selectedDateCategory}` : ''}`}>
                 <TableComponent data={dateTableData} columns={dateTableColumns} />
             </Widget>
         </div>
@@ -146,7 +146,7 @@ function App() {
                    activeIndex={activeStatusPieIndex}
                 />
             </Widget>
-             <Widget title={`Статистика контрактов по статусу${selectedStatusCategory ? `: ${selectedStatusCategory}` : ''}`}>
+             <Widget title={`Статистика контрактов по статусу${selectedStatusCategory ? `: ${statusPieData.find(d => d.status === selectedStatusCategory)?.name || selectedStatusCategory}` : ''}`}>
                 <TableComponent data={statusTableData} columns={statusTableColumns} />
             </Widget>
         </div>
