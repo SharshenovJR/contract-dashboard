@@ -17,10 +17,10 @@ function App() {
   const [dateTableData, setDateTableData] = useState([]);
   const [statusTableData, setStatusTableData] = useState([]);
 
+  // Single selected category/index for pie
   const [selectedDateCategory, setSelectedDateCategory] = useState(null);
-  const [selectedStatusCategory, setSelectedStatusCategory] = useState(null);
-
   const [activeDatePieIndex, setActiveDatePieIndex] = useState(null);
+  const [selectedStatusCategory, setSelectedStatusCategory] = useState(null);
   const [activeStatusPieIndex, setActiveStatusPieIndex] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -60,64 +60,32 @@ function App() {
     loadInitialData();
   }, []);
 
-   useEffect(() => {
-        if (loading) return;
-
-       const loadFilteredDateTable = async () => {
-            console.log(`Fetching date table data for category: ${selectedDateCategory}`);
-           try {
-               const data = await fetchDateStatsTable(selectedDateCategory);
-               setDateTableData(data || []);
-           } catch (err) {
-               console.error(`Failed to fetch filtered date table data for ${selectedDateCategory}:`, err);
-               setError(`Ошибка при загрузке данных по категории "${selectedDateCategory}": ${err.message}`);
-           } finally {
-           }
-       };
-
-       loadFilteredDateTable();
-
-   }, [selectedDateCategory, loading]);
-
-    useEffect(() => {
-         if (loading) return;
-
-        const loadFilteredStatusTable = async () => {
-            console.log(`Fetching status table data for category: ${selectedStatusCategory}`);
-            try {
-               const data = await fetchStatusStatsTable(selectedStatusCategory);
-               setStatusTableData(data || []);
-            } catch (err) {
-                console.error(`Failed to fetch filtered status table data for ${selectedStatusCategory}:`, err);
-                 setError(`Ошибка при загрузке данных по категории "${selectedStatusCategory}": ${err.message}`);
-            } finally {
-            }
-        };
-
-        loadFilteredStatusTable();
-
-    }, [selectedStatusCategory, loading]);
-
+   // Single-select for pie by date
    const handleDateSliceClick = useCallback((categoryName, index) => {
        if (selectedDateCategory === categoryName) {
            setSelectedDateCategory(null);
            setActiveDatePieIndex(null);
+           // Show all if unselected
+           fetchDateStatsTable(null).then(data => setDateTableData(data || []));
        } else {
            setSelectedDateCategory(categoryName);
            setActiveDatePieIndex(index);
+           fetchDateStatsTable(categoryName).then(data => setDateTableData(data || []));
        }
    }, [selectedDateCategory]);
 
-
-    const handleStatusSliceClick = useCallback((categoryName, index) => {
+   // Single-select for pie by status
+   const handleStatusSliceClick = useCallback((categoryName, index) => {
        if (selectedStatusCategory === categoryName) {
            setSelectedStatusCategory(null);
            setActiveStatusPieIndex(null);
+           fetchStatusStatsTable(null).then(data => setStatusTableData(data || []));
        } else {
            setSelectedStatusCategory(categoryName);
            setActiveStatusPieIndex(index);
+           fetchStatusStatsTable(categoryName).then(data => setStatusTableData(data || []));
        }
-    }, [selectedStatusCategory]);
+   }, [selectedStatusCategory]);
 
   const dateTableColumns = [
     { header: 'Номер контракта', accessor: 'number' },
