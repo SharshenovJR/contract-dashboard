@@ -1,0 +1,132 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+}
+
+.dashboard-container {
+  padding: 20px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.dashboard-header-icons span {
+    margin-left: 15px;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: #666;
+}
+
+
+.widgets-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Две колонки равной ширины */
+  gap: 20px; /* Промежуток между виджетами */
+}
+
+.widget {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* Важно для скролла таблицы */
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between; /* Может быть flex-start, если нет иконки */
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  background-color: #f9f9f9;
+}
+
+.widget-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #555;
+}
+
+/* --- УДАЛЕННО: ПРАВИЛО ДЛЯ settings-icon ---
+.settings-icon {
+  font-size: 1.2em;
+  color: #666;
+  cursor: pointer;
+}
+--------------------------------------------- */
+
+.widget-content {
+  padding: 15px;
+}
+
+/* Styles for TableComponent */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Добавить горизонтальный скролл если таблица широкая */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* Optional: zebra stripes */
+tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+/* Optional: hover effect */
+tbody tr:hover {
+    background-color: #e9e9e9;
+}
+
+/* Styles for PieChartComponent legend */
+.chart-legend {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap; /* Перенос легенды на следующую строку */
+}
+
+.chart-legend li {
+  margin: 0 10px 5px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+  border-radius: 3px;
+}
