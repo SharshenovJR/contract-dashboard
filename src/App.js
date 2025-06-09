@@ -120,10 +120,6 @@ function App() {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-          <h1>Статистика контрактов</h1>
-      </header>
-
       <div className="widgets-layout">
         <div>
             <Widget title="Контракты по дате">
