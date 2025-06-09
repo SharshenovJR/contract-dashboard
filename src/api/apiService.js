@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080/aidstat/ws/public';
+const API_BASE_URL = 'https://aidstat.kg/aidstat/ws/public';
 const DATE_STATS_PIE_URL = `${API_BASE_URL}/contract-stats/date/pie`;
 const DATE_STATS_TABLE_URL = `${API_BASE_URL}/contract-stats/date/table`;
 const STATUS_STATS_PIE_URL = `${API_BASE_URL}/contract-stats/status/pie`;
@@ -18,13 +18,13 @@ const fetchData = async (url) => {
            errorDetail = errorBody;
       }
     } catch (e) {
-       // ignore
+      console.error("Ошибка при обработке тела ответа:", e);
     }
     throw new Error(`Ошибка HTTP! Статус: ${response.status}, Детали: ${errorDetail}`);
   }
 
   const data = await response.json();
-  return data; // Ожидается список DTO
+  return data;
 };
 
 export const fetchDateStatsPie = async () => {
