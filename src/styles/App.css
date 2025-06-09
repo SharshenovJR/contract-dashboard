@@ -35,15 +35,15 @@ body {
 
 .widgets-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Две колонки равной ширины */
-  gap: 20px; /* Промежуток между виджетами */
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
 
 .widget {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  overflow: hidden; /* Важно для скролла таблицы */
+  overflow: hidden;
 }
 
 .widget-header {
@@ -61,22 +61,13 @@ body {
   color: #555;
 }
 
-/* --- УДАЛЕННО: ПРАВИЛО ДЛЯ settings-icon ---
-.settings-icon {
-  font-size: 1.2em;
-  color: #666;
-  cursor: pointer;
-}
---------------------------------------------- */
-
 .widget-content {
   padding: 15px;
 }
 
-/* Styles for TableComponent */
 .table-container {
     width: 100%;
-    overflow-x: auto; /* Добавить горизонтальный скролл если таблица широкая */
+    overflow-x: auto;
 }
 
 table {
@@ -96,24 +87,21 @@ th {
   font-weight: bold;
 }
 
-/* Optional: zebra stripes */
 tbody tr:nth-child(even) {
     background-color: #f8f8f8;
 }
 
-/* Optional: hover effect */
 tbody tr:hover {
     background-color: #e9e9e9;
 }
 
-/* Styles for PieChartComponent legend */
 .chart-legend {
   list-style: none;
   padding: 0;
   margin: 10px 0 0 0;
   display: flex;
   justify-content: center;
-  flex-wrap: wrap; /* Перенос легенды на следующую строку */
+  flex-wrap: wrap;
 }
 
 .chart-legend li {
@@ -129,4 +117,35 @@ tbody tr:hover {
   height: 12px;
   margin-right: 5px;
   border-radius: 3px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.pagination-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  background: #fff;
+  color: #222;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.15s;
+  min-width: 32px;
+}
+.pagination-btn[disabled], .pagination-btn.disabled {
+  background: #eee;
+  color: #aaa;
+  cursor: not-allowed;
+  border: 1px solid #ddd;
+}
+.pagination-btn.active {
+  background: #1976d2;
+  color: #fff;
+  border: 2px solid #1976d2;
+  font-weight: 600;
 }

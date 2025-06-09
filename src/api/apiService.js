@@ -18,13 +18,13 @@ const fetchData = async (url) => {
            errorDetail = errorBody;
       }
     } catch (e) {
-       // ignore
+      console.error("Ошибка при обработке тела ответа:", e);
     }
     throw new Error(`Ошибка HTTP! Статус: ${response.status}, Детали: ${errorDetail}`);
   }
 
   const data = await response.json();
-  return data; // Ожидается список DTO
+  return data;
 };
 
 export const fetchDateStatsPie = async () => {
