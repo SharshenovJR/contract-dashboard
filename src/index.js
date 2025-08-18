@@ -1,11 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client'; // или 'react-dom' для старых версий
-import App from './App';
-// Убедитесь, что у вас есть корневой элемент в public/index.html (обычно <div id="root"></div>)
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import App from './components/ContractDashboard';
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );

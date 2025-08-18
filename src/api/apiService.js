@@ -3,6 +3,9 @@ const DATE_STATS_PIE_URL = `${API_BASE_URL}/contract-stats/date/pie`;
 const DATE_STATS_TABLE_URL = `${API_BASE_URL}/contract-stats/date/table`;
 const STATUS_STATS_PIE_URL = `${API_BASE_URL}/contract-stats/status/pie`;
 const STATUS_STATS_TABLE_URL = `${API_BASE_URL}/contract-stats/status/table`;
+const PROJECT_STATS_PIE_URL = `${API_BASE_URL}/project-stats/date/pie`;
+const PROJECT_STATS_TABLE_URL = `${API_BASE_URL}/project-stats/date/table`;
+
 
 const fetchData = async (url) => {
   console.log("Fetching from:", url); // Логируем URL запроса
@@ -49,4 +52,16 @@ export const fetchStatusStatsTable = async (category) => {
         url = `${url}?category=${encodeURIComponent(category)}`;
     } 
    return fetchData(url);
+};
+
+export const fetchProjectDateStatsPie = async () => {
+  return fetchData(PROJECT_STATS_PIE_URL);
+};
+
+export const fetchProjectDateStatsTable = async (category) => {
+  let url = PROJECT_STATS_TABLE_URL;
+  if (category) {
+    url = `${url}?category=${encodeURIComponent(category)}`;
+  }
+  return fetchData(url);
 };
