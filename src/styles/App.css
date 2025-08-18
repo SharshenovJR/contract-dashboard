@@ -39,6 +39,11 @@ body {
   gap: 20px;
 }
 
+.widgets-layout--single {
+  grid-template-columns: minmax(320px, 720px);
+  justify-content: center;
+}
+
 .widget {
   background-color: #fff;
   border-radius: 8px;
