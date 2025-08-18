@@ -1,4 +1,3 @@
-import React from 'react';
 import Dashboard from './Dashboard';
 import {
   fetchProjectDateStatsPie,
@@ -20,11 +19,13 @@ const ProjectDashboard = () => {
 
   return (
     <Dashboard
-      mainTitle="Статистика проектов"
+      mainTitle=""
       category1={category1}
       category2={null}
       loadTable1OnInit={false}
       emptyTableOnDeselect1={true}
+      rowsPerPage={10}
+      hideHeader={true}
     />
   );
 };

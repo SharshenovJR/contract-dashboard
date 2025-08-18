@@ -1,13 +1,10 @@
-// src/components/ContractDashboard.js
-
-import React from 'react';
 import Dashboard from './Dashboard';
 import {
   fetchDateStatsPie,
   fetchDateStatsTable,
   fetchStatusStatsPie,
   fetchStatusStatsTable
-} from '../api/apiService'; // Убедитесь, что путь верный
+} from '../api/apiService';
 
 const ContractDashboard = () => {
   const dateTableColumns = [
