@@ -1,5 +1,3 @@
-// src/components/Dashboard.js
-
 import { useEffect, useState, useCallback } from 'react';
 import Widget from './Widget';
 import PieChartComponent from './PieChartComponent';
@@ -58,6 +56,8 @@ function Dashboard({
   loadTable2OnInit = true,
   emptyTableOnDeselect1 = false,
   emptyTableOnDeselect2 = false,
+  rowsPerPage: rowsPerPageProp = 10,
+  hideHeader = false,
 }) {
   const [pieData1, setPieData1] = useState([]);
   const [tableData1, setTableData1] = useState([]);
@@ -73,7 +73,7 @@ function Dashboard({
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [rowsPerPage] = useState(10);
+  const rowsPerPage = rowsPerPageProp;
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -157,7 +157,9 @@ function Dashboard({
   if (loading) {
     return (
       <div className="dashboard-container">
-         <header className="dashboard-header"><h1>{mainTitle}</h1></header>
+         {!hideHeader && (
+           <header className="dashboard-header"><h1>{mainTitle}</h1></header>
+         )}
         <div style={{ padding: '20px' }}>Загрузка данных...</div>
       </div>
     );
@@ -166,7 +168,9 @@ function Dashboard({
   if (error) {
     return (
        <div className="dashboard-container">
-         <header className="dashboard-header"><h1>{mainTitle}</h1></header>
+         {!hideHeader && (
+           <header className="dashboard-header"><h1>{mainTitle}</h1></header>
+         )}
         <div style={{ padding: '20px', color: 'red' }}>{error}</div>
       </div>
     );
@@ -180,9 +184,11 @@ function Dashboard({
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <h1>{mainTitle}</h1>
-      </header>
+      {!hideHeader && (
+        <header className="dashboard-header">
+          <h1>{mainTitle}</h1>
+        </header>
+      )}
       <div className={`widgets-layout${category2 ? '' : ' widgets-layout--single'}`}>
         <div>
             <Widget title={category1.title}>
