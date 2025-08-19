@@ -36,7 +36,7 @@ const ContractDashboard = () => {
 
   return (
     <Dashboard
-      mainTitle="Статистика контрактов"
+      mainTitle=""
       category1={category1}
       category2={category2}
     />
