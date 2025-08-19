@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://aidstat.kg/aidstat/ws/public';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const DATE_STATS_PIE_URL = `${API_BASE_URL}/contract-stats/date/pie`;
 const DATE_STATS_TABLE_URL = `${API_BASE_URL}/contract-stats/date/table`;
 const STATUS_STATS_PIE_URL = `${API_BASE_URL}/contract-stats/status/pie`;
