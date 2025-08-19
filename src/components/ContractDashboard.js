@@ -39,6 +39,7 @@ const ContractDashboard = () => {
       mainTitle=""
       category1={category1}
       category2={category2}
+      hideHeader={true}
     />
   );
 };
