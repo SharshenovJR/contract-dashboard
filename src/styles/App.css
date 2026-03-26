@@ -154,3 +154,34 @@ tbody tr:hover {
   border: 2px solid #1976d2;
   font-weight: 600;
 }
+
+.widget-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.export-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #4caf50;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #4caf50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.export-btn:hover {
+  background: #4caf50;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+.export-icon {
+  font-size: 16px;
+}
+

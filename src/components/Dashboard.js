@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Widget from './Widget';
 import PieChartComponent from './PieChartComponent';
 import TableComponent from './TableComponent';
+import { exportToExcel } from '../utils/exportUtils';
 import '../styles/App.css';
 
 const Pagination = ({ page, pageCount, onPageChange }) => {
@@ -110,7 +111,7 @@ function Dashboard({
     };
 
     loadInitialData();
-  }, [category1.fetchPie, category1.fetchTable, category2 && category2.fetchPie, category2 && category2.fetchTable, loadTable1OnInit, loadTable2OnInit]); // Зависимости на функции
+  }, [category1, category1.fetchPie, category1.fetchTable, category2, loadTable1OnInit, loadTable2OnInit]); // Зависимости на функции
 
    const handleSliceClick1 = useCallback((categoryName, index) => {
        if (selectedCategory1 === categoryName) {
@@ -126,7 +127,7 @@ function Dashboard({
            setActivePieIndex1(index);
            category1.fetchTable(categoryName).then(data => setTableData1(data || []));
        }
-   }, [selectedCategory1, category1.fetchTable, emptyTableOnDeselect1]);
+   }, [selectedCategory1, emptyTableOnDeselect1, category1]);
 
    const handleSliceClick2 = useCallback((categoryName, index) => {
        if (!category2) return;
@@ -182,6 +183,18 @@ function Dashboard({
     return `Статистика: ${baseTitle} (${categoryName})`
   }
 
+  const renderExportButtons = (data, columns, filename) => (
+    <div className="export-buttons">
+      <button 
+        className="export-btn excel" 
+        onClick={() => exportToExcel(data, columns, filename)}
+        title="Экспорт в Excel"
+      >
+        <span className="export-icon">📊</span> Экспорт в Excel
+      </button>
+    </div>
+  );
+
   return (
     <div className="dashboard-container">
       {!hideHeader && (
@@ -194,7 +207,10 @@ function Dashboard({
             <Widget title={category1.title}>
                 <PieChartComponent data={pieData1} onSliceClick={handleSliceClick1} activeIndex={activePieIndex1}/>
             </Widget>
-            <Widget title={getTableTitle(category1.title, pieData1, selectedCategory1)}>
+            <Widget 
+                title={getTableTitle(category1.title, pieData1, selectedCategory1)}
+                headerActions={renderExportButtons(tableData1, category1.tableColumns, category1.title)}
+            >
                 <TableComponent data={paginatedTable1Data} columns={category1.tableColumns} />
                 <Pagination page={page1} pageCount={table1PageCount} onPageChange={p => setPage1(p)} />
             </Widget>
@@ -205,7 +221,10 @@ function Dashboard({
               <Widget title={category2.title}>
                   <PieChartComponent data={pieData2} onSliceClick={handleSliceClick2} activeIndex={activePieIndex2} />
               </Widget>
-               <Widget title={getTableTitle(category2.title, pieData2, selectedCategory2)}>
+               <Widget 
+                  title={getTableTitle(category2.title, pieData2, selectedCategory2)}
+                  headerActions={renderExportButtons(tableData2, category2.tableColumns, category2.title)}
+               >
                   <TableComponent data={paginatedTable2Data} columns={category2.tableColumns} />
                   <Pagination page={page2} pageCount={table2PageCount} onPageChange={p => setPage2(p)} />
               </Widget>
