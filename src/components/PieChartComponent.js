@@ -1,104 +1,80 @@
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Sector } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts';
 
-const CustomLegend = ({ payload }) => {
+const formatNumber = (value) => Number(value || 0).toLocaleString('ru-RU');
+
+const ChartTooltip = ({ active, payload, total }) => {
+  if (!active || !payload || !payload.length) return null;
+  const { name, value, payload: entry } = payload[0];
+  const percent = total ? Math.round((value / total) * 100) : 0;
   return (
-    <ul className="chart-legend" style={{
-      display: 'flex',
-      gap: '32px',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      listStyle: 'none',
-      margin: 0,
-      padding: 0,
-      fontSize: '1.08rem',
-      fontWeight: 500
-    }}>
-      {payload.map((entry, index) => (
-        <li key={`legend-${index}`} style={{
-          color: entry.color,
-          display: 'flex',
-          alignItems: 'center',
-          transition: 'color 0.2s',
-          cursor: 'pointer',
-        }}>
-          <span className="legend-color" style={{
-            display: 'inline-block',
-            width: 14,
-            height: 14,
-            borderRadius: '50%',
-            backgroundColor: entry.color,
-            marginRight: 8,
-            border: '2px solid #fff',
-            boxShadow: '0 0 2px #aaa',
-          }}></span>
-          {entry.value}
-        </li>
-      ))}
-    </ul>
+    <div className="chart-tooltip">
+      <div className="chart-tooltip-title">
+        <span className="legend-color" style={{ backgroundColor: entry.color }} />
+        {name}
+      </div>
+      <div className="chart-tooltip-value">{formatNumber(value)} · {percent}%</div>
+    </div>
   );
-}
+};
+
+const renderActiveShape = ({ cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill }) => (
+  <g>
+    <Sector
+      cx={cx}
+      cy={cy}
+      innerRadius={innerRadius}
+      outerRadius={outerRadius + 8}
+      startAngle={startAngle}
+      endAngle={endAngle}
+      fill={fill}
+      cornerRadius={4}
+    />
+  </g>
+);
 
 const PieChartComponent = ({ data, onSliceClick, activeIndex }) => {
-  const RADIAN = Math.PI / 180;
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }) => {
-    const radius = outerRadius + 10;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  const total = data.reduce((sum, d) => sum + (d.value || 0), 0);
+  const active = activeIndex !== null && activeIndex !== undefined ? data[activeIndex] : null;
 
-    return (
-      <text x={x} y={y} fill={data[index].color} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-        {`${name}: ${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
-
-  const renderActiveShape = (props) => {
-    const {
-      cx, cy, innerRadius, outerRadius, startAngle, endAngle,
-      fill
-    } = props;
-    return (
-      <g>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius + 10}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-        />
-      </g>
-    );
-  };
-
+  if (!total) return <p className="empty-state">Нет данных для отображения.</p>;
 
   return (
-    <div style={{ width: '100%', height: 300 }}>
+    <div className="pie-chart-box">
       <ResponsiveContainer>
         <PieChart>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
-            outerRadius={80}
-            fill="#8884d8"
+            innerRadius="58%"
+            outerRadius="82%"
+            paddingAngle={data.length > 1 ? 2 : 0}
+            cornerRadius={4}
             dataKey="value"
-            activeIndex={activeIndex}
+            stroke="none"
+            activeIndex={activeIndex ?? undefined}
             activeShape={renderActiveShape}
+            isAnimationActive={false}
+            onClick={(_, index) => data[index] && onSliceClick(data[index].status, index)}
+            style={{ cursor: 'pointer', outline: 'none' }}
           >
             {data.map((entry, index) => (
               <Cell
-                key={`cell-${index}`}
+                key={entry.status || index}
                 fill={entry.color}
-                onClick={() => onSliceClick(entry.status, index)}
+                opacity={active && activeIndex !== index ? 0.35 : 1}
               />
             ))}
           </Pie>
-          <Tooltip formatter={(value, name, props) => [`${value}`, name]} />
-           <Legend />
+          <Tooltip content={<ChartTooltip total={total} />} />
         </PieChart>
       </ResponsiveContainer>
+      <div className="pie-center">
+        <div className="pie-center-value">{formatNumber(active ? active.value : total)}</div>
+        <div className="pie-center-label">
+          {active ? `${Math.round((active.value / total) * 100)}% от всех` : 'всего'}
+        </div>
+      </div>
     </div>
   );
 };

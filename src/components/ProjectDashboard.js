@@ -4,30 +4,27 @@ import {
   fetchProjectDateStatsTable,
 } from '../api/apiService';
 
-const ProjectDashboard = () => {
-  const projectTableColumns = [
-    { header: 'Название проекта', accessor: 'name' },
-    { header: 'ОРП', accessor: 'orp' },
-  ];
+const projectTableColumns = [
+  { header: 'Название проекта', accessor: 'name', wide: true },
+  { header: 'ОРП', accessor: 'orp' },
+];
 
-  const category1 = {
-    title: 'Проекты по дате завершения',
-    fetchPie: fetchProjectDateStatsPie,
-    fetchTable: fetchProjectDateStatsTable,
-    tableColumns: projectTableColumns,
-  };
-
-  return (
-    <Dashboard
-      mainTitle=""
-      category1={category1}
-      category2={null}
-      loadTable1OnInit={false}
-      emptyTableOnDeselect1={true}
-      rowsPerPage={10}
-      hideHeader={true}
-    />
-  );
+const category1 = {
+  title: 'Проекты по дате завершения',
+  fetchPie: fetchProjectDateStatsPie,
+  fetchTable: fetchProjectDateStatsTable,
+  tableColumns: projectTableColumns,
 };
+
+const ProjectDashboard = () => (
+  <Dashboard
+    title="Статистика проектов"
+    subtitle="Завершенные проекты и проекты в работе — в графике и с отставанием"
+    category1={category1}
+    loadTable1OnInit={false}
+    emptyTableOnDeselect1={true}
+    rowsPerPage={10}
+  />
+);
 
 export default ProjectDashboard;
