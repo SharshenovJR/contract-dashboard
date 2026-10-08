@@ -69,22 +69,22 @@ const TABS = {
     columns: [
       { header: 'ОРП', accessor: 'name' },
       { header: 'Тип', accessor: 'type' },
-      { header: 'Проектов', accessor: 'projectCount', numeric: true },
-      { header: 'Последняя заливка', accessor: 'lastUpload', date: true },
-      { header: 'Дней с заливками (30 дн.)', accessor: 'uploadDays30', numeric: true },
-      { header: 'Записей залито (30 дн.)', accessor: 'records30', numeric: true },
-      { header: 'Последний отчет', accessor: 'lastReport', date: true },
-      { header: 'Отчетов (90 дн.)', accessor: 'reports90', numeric: true },
-      { header: 'Входов (30 дн.)', accessor: 'logins30', numeric: true },
-      { header: 'Дней со входом (30 дн.)', accessor: 'loginDays30', numeric: true },
-      { header: 'Последняя активность', accessor: 'lastActive', date: true },
-      { header: 'Пользователей', accessor: 'userCount', numeric: true },
+      { header: 'Проектов', accessor: 'projectCount', numeric: true, hint: 'Проекты этого ОРП, без архивных.' },
+      { header: 'Последняя заливка', accessor: 'lastUpload', date: true, hint: 'Когда пользователь ОРП последний раз создал или изменил данные в своих проектах. Заливка — запись проекта, компонента, контракта, освоения, баланса или бюджета, созданная или измененная пользователем ОРП (в т.ч. через API).' },
+      { header: 'Дней с заливками (30 дн.)', accessor: 'uploadDays30', numeric: true, hint: 'В скольких разных днях за последние 30 дней были заливки. Показывает регулярность: 1 — всё залили за один день, 20 — работают почти ежедневно.' },
+      { header: 'Записей залито (30 дн.)', accessor: 'records30', numeric: true, hint: 'Сколько записей создано или изменено за последние 30 дней. Показывает объем работы.' },
+      { header: 'Последний отчет', accessor: 'lastReport', date: true, hint: 'Дата последней отправки квартального или месячного отчета по любому проекту ОРП.' },
+      { header: 'Отчетов (90 дн.)', accessor: 'reports90', numeric: true, hint: 'Сколько отчетов (квартальных и месячных) отправлено за последние 90 дней.' },
+      { header: 'Входов (30 дн.)', accessor: 'logins30', numeric: true, hint: 'Сколько раз все пользователи ОРП входили в систему за последние 30 дней.' },
+      { header: 'Дней со входом (30 дн.)', accessor: 'loginDays30', numeric: true, hint: 'В скольких разных днях за 30 дней был хотя бы один вход. 10 входов в один день = 1 день.' },
+      { header: 'Последняя активность', accessor: 'lastActive', date: true, hint: 'Когда кто-то из пользователей ОРП последний раз был в системе.' },
+      { header: 'Пользователей', accessor: 'userCount', numeric: true, hint: 'Сколько учетных записей привязано к ОРП.' },
     ],
     kpis: (rows) => [
       { label: 'Всего ОРП', icon: '🏢', value: rows.length },
-      { label: 'Заливали за 7 дней', icon: '⬆', tone: 'good', share: true, value: rows.filter((r) => (daysSince(r.lastUpload) ?? Infinity) <= 7).length },
-      { label: 'Без заливок > 30 дней', icon: '⏳', alert: true, share: true, value: rows.filter((r) => (daysSince(r.lastUpload) ?? Infinity) > 30).length },
-      { label: 'Отчетов за 90 дней', icon: '📄', value: rows.reduce((sum, r) => sum + (r.reports90 || 0), 0) },
+      { label: 'Заливали за 7 дней', hint: 'ОРП, у которых последняя заливка была не раньше 7 дней назад. Процент — от всех ОРП.', icon: '⬆', tone: 'good', share: true, value: rows.filter((r) => (daysSince(r.lastUpload) ?? Infinity) <= 7).length },
+      { label: 'Без заливок > 30 дней', hint: 'Последняя заливка была больше 30 дней назад или ее не было вообще. Процент — от общего числа.', icon: '⏳', alert: true, share: true, value: rows.filter((r) => (daysSince(r.lastUpload) ?? Infinity) > 30).length },
+      { label: 'Отчетов за 90 дней', hint: 'Сумма отправленных квартальных и месячных отчетов за последние 90 дней.', icon: '📄', value: rows.reduce((sum, r) => sum + (r.reports90 || 0), 0) },
     ],
   },
   projects: {
@@ -98,25 +98,25 @@ const TABS = {
       { header: 'Проект', accessor: 'name', wide: true },
       { header: 'ОРП', accessor: 'orp' },
       { header: 'Куратор', accessor: 'curator' },
-      { header: 'Последняя заливка', accessor: 'lastUpload', date: true },
-      { header: 'Дней с заливками (30 дн.)', accessor: 'uploadDays30', numeric: true },
-      { header: 'Записей (30 дн.)', accessor: 'records30', numeric: true },
-      { header: 'Записей всего', accessor: 'recordsTotal', numeric: true },
-      { header: 'Последний отчет', accessor: 'lastReport', date: true },
-      { header: 'Отчетов (90 дн.)', accessor: 'reports90', numeric: true },
-      { header: 'Отчетов всего', accessor: 'reportsTotal', numeric: true },
-      { header: 'Просмотров (30 дн.)', accessor: 'views30', numeric: true },
-      { header: 'Смотрели (30 дн.), чел.', accessor: 'viewers30', numeric: true },
-      { header: 'Просмотров куратором (30 дн.)', accessor: 'curatorViews30', numeric: true },
-      { header: 'Последний просмотр', accessor: 'lastView', date: true },
-      { header: 'Последний просмотр куратором', accessor: 'lastCuratorView', date: true },
+      { header: 'Последняя заливка', accessor: 'lastUpload', date: true, hint: 'Когда ОРП последний раз создал или изменил данные проекта. Заливка — запись проекта, компонента, контракта, освоения, баланса или бюджета, созданная или измененная пользователем ОРП (в т.ч. через API).' },
+      { header: 'Дней с заливками (30 дн.)', accessor: 'uploadDays30', numeric: true, hint: 'В скольких разных днях за последние 30 дней были заливки по проекту.' },
+      { header: 'Записей (30 дн.)', accessor: 'records30', numeric: true, hint: 'Сколько записей проекта создано или изменено ОРП за последние 30 дней.' },
+      { header: 'Записей всего', accessor: 'recordsTotal', numeric: true, hint: 'Сколько записей проекта создано или изменено ОРП за все время.' },
+      { header: 'Последний отчет', accessor: 'lastReport', date: true, hint: 'Дата последней отправки квартального или месячного отчета по проекту.' },
+      { header: 'Отчетов (90 дн.)', accessor: 'reports90', numeric: true, hint: 'Сколько отчетов по проекту отправлено за последние 90 дней.' },
+      { header: 'Отчетов всего', accessor: 'reportsTotal', numeric: true, hint: 'Сколько отчетов по проекту отправлено за все время.' },
+      { header: 'Просмотров (30 дн.)', accessor: 'views30', numeric: true, hint: 'Сколько раз за 30 дней кто-либо открывал проект или его отчеты.' },
+      { header: 'Смотрели (30 дн.), чел.', accessor: 'viewers30', numeric: true, hint: 'Сколько разных людей открывали проект или его отчеты за 30 дней.' },
+      { header: 'Просмотров куратором (30 дн.)', accessor: 'curatorViews30', numeric: true, hint: 'Сколько раз за 30 дней проект или его отчеты открывал куратор этого проекта.' },
+      { header: 'Последний просмотр', accessor: 'lastView', date: true, hint: 'Когда проект или его отчет последний раз открывал кто-либо.' },
+      { header: 'Последний просмотр куратором', accessor: 'lastCuratorView', date: true, hint: 'Когда проект или его отчет последний раз открывал куратор проекта.' },
     ],
     kpis: (rows) => [
       { label: 'Всего проектов', icon: '📁', value: rows.length },
-      { label: 'Обновлялись за 7 дней', icon: '⬆', tone: 'good', share: true, value: rows.filter((r) => (daysSince(r.lastUpload) ?? Infinity) <= 7).length },
-      { label: 'Без заливок > 30 дней', icon: '⏳', alert: true, share: true, value: rows.filter((r) => (daysSince(r.lastUpload) ?? Infinity) > 30).length },
-      { label: 'Ни разу не заливали', icon: '∅', alert: true, share: true, value: rows.filter((r) => !r.lastUpload).length },
-      { label: 'Куратор не открывал > 30 дней', icon: '👁', alert: true, share: true, value: rows.filter((r) => r.curator && (daysSince(r.lastCuratorView) ?? Infinity) > 30).length },
+      { label: 'Обновлялись за 7 дней', hint: 'Проекты, по которым ОРП заливал данные за последние 7 дней.', icon: '⬆', tone: 'good', share: true, value: rows.filter((r) => (daysSince(r.lastUpload) ?? Infinity) <= 7).length },
+      { label: 'Без заливок > 30 дней', hint: 'Последняя заливка была больше 30 дней назад или ее не было вообще. Процент — от общего числа.', icon: '⏳', alert: true, share: true, value: rows.filter((r) => (daysSince(r.lastUpload) ?? Infinity) > 30).length },
+      { label: 'Ни разу не заливали', hint: 'По проекту нет ни одной записи, созданной или измененной пользователем ОРП.', icon: '∅', alert: true, share: true, value: rows.filter((r) => !r.lastUpload).length },
+      { label: 'Куратор не открывал > 30 дней', hint: 'Проекты с назначенным куратором, которые он не открывал (ни проект, ни отчеты) больше 30 дней.', icon: '👁', alert: true, share: true, value: rows.filter((r) => r.curator && (daysSince(r.lastCuratorView) ?? Infinity) > 30).length },
     ],
   },
   curators: {
@@ -128,28 +128,28 @@ const TABS = {
     columns: [
       { header: 'Куратор', accessor: 'name' },
       { header: 'Логин', accessor: 'login' },
-      { header: 'Проектов', accessor: 'projectCount', numeric: true },
-      { header: 'Последняя активность', accessor: 'lastActive', date: true },
-      { header: 'Последний вход', accessor: 'lastLogin', date: true },
-      { header: 'Входов (30 дн.)', accessor: 'logins30', numeric: true },
-      { header: 'Дней со входом (30 дн.)', accessor: 'loginDays30', numeric: true },
-      { header: 'Отчетов просмотрено (30 дн.)', accessor: 'reportsViewed30', numeric: true },
-      { header: 'Просмотров отчетов всего', accessor: 'viewsTotal', numeric: true },
-      { header: 'Последний просмотр отчета', accessor: 'lastView', date: true },
-      { header: 'Проектов открыто (30 дн.)', accessor: 'projectsViewed30', numeric: true },
-      { header: 'Последний просмотр проекта', accessor: 'lastProjectView', date: true },
-      { header: 'Ждут рассмотрения', accessor: 'pendingReports', numeric: true, alertIfPositive: true },
-      { header: 'Смен статуса (30 дн.)', accessor: 'statusChanges30', numeric: true },
-      { header: 'Отчетов обработано (30 дн.)', accessor: 'reportsProcessed30', numeric: true },
-      { header: 'Смен статуса всего', accessor: 'statusChangesTotal', numeric: true },
-      { header: 'Последняя смена статуса', accessor: 'lastStatusChange', date: true },
+      { header: 'Проектов', accessor: 'projectCount', numeric: true, hint: 'Сколько проектов закреплено за куратором, без архивных.' },
+      { header: 'Последняя активность', accessor: 'lastActive', date: true, hint: 'Когда куратор последний раз был в системе.' },
+      { header: 'Последний вход', accessor: 'lastLogin', date: true, hint: 'Дата последнего входа в систему по журналу.' },
+      { header: 'Входов (30 дн.)', accessor: 'logins30', numeric: true, hint: 'Сколько раз куратор входил в систему за последние 30 дней.' },
+      { header: 'Дней со входом (30 дн.)', accessor: 'loginDays30', numeric: true, hint: 'В скольких разных днях за 30 дней был хотя бы один вход.' },
+      { header: 'Отчетов просмотрено (30 дн.)', accessor: 'reportsViewed30', numeric: true, hint: 'Сколько разных отчетов куратор открыл за последние 30 дней.' },
+      { header: 'Просмотров отчетов всего', accessor: 'viewsTotal', numeric: true, hint: 'Сколько раз куратор открывал отчеты за все время (повторные открытия тоже считаются).' },
+      { header: 'Последний просмотр отчета', accessor: 'lastView', date: true, hint: 'Когда куратор последний раз открывал отчет.' },
+      { header: 'Проектов открыто (30 дн.)', accessor: 'projectsViewed30', numeric: true, hint: 'Сколько разных проектов куратор открыл за последние 30 дней.' },
+      { header: 'Последний просмотр проекта', accessor: 'lastProjectView', date: true, hint: 'Когда куратор последний раз открывал проект.' },
+      { header: 'Ждут рассмотрения', accessor: 'pendingReports', numeric: true, alertIfPositive: true, hint: 'Отчеты по проектам куратора, которые сейчас в статусе «на рассмотрении» и ждут его решения.' },
+      { header: 'Смен статуса (30 дн.)', accessor: 'statusChanges30', numeric: true, hint: 'Сколько раз куратор менял статус отчетов за последние 30 дней.' },
+      { header: 'Отчетов обработано (30 дн.)', accessor: 'reportsProcessed30', numeric: true, hint: 'В скольких разных отчетах куратор менял статус за 30 дней. Отклонил, а потом принял один отчет = 2 смены статуса, но 1 обработанный отчет.' },
+      { header: 'Смен статуса всего', accessor: 'statusChangesTotal', numeric: true, hint: 'Сколько раз куратор менял статус отчетов за все время.' },
+      { header: 'Последняя смена статуса', accessor: 'lastStatusChange', date: true, hint: 'Когда куратор последний раз менял статус отчета.' },
     ],
     kpis: (rows) => [
       { label: 'Кураторов', icon: '👤', value: rows.length },
-      { label: 'Активны за 7 дней', icon: '✓', tone: 'good', share: true, value: rows.filter((r) => (daysSince(r.lastActive) ?? Infinity) <= 7).length },
-      { label: 'Отчетов просмотрено за 30 дней', icon: '👁', value: rows.reduce((sum, r) => sum + (r.reportsViewed30 || 0), 0) },
-      { label: 'Отчетов ждут рассмотрения', icon: '⏳', alert: true, value: rows.reduce((sum, r) => sum + (r.pendingReports || 0), 0) },
-      { label: 'Смен статуса за 30 дней', icon: '⇄', value: rows.reduce((sum, r) => sum + (r.statusChanges30 || 0), 0) },
+      { label: 'Активны за 7 дней', hint: 'Кураторы, которые были в системе за последние 7 дней.', icon: '✓', tone: 'good', share: true, value: rows.filter((r) => (daysSince(r.lastActive) ?? Infinity) <= 7).length },
+      { label: 'Отчетов просмотрено за 30 дней', hint: 'Сумма разных отчетов, открытых кураторами за последние 30 дней.', icon: '👁', value: rows.reduce((sum, r) => sum + (r.reportsViewed30 || 0), 0) },
+      { label: 'Отчетов ждут рассмотрения', hint: 'Сколько отчетов сейчас в статусе «на рассмотрении» по всем кураторам.', icon: '⏳', alert: true, value: rows.reduce((sum, r) => sum + (r.pendingReports || 0), 0) },
+      { label: 'Смен статуса за 30 дней', hint: 'Сколько раз кураторы меняли статус отчетов за последние 30 дней.', icon: '⇄', value: rows.reduce((sum, r) => sum + (r.statusChanges30 || 0), 0) },
     ],
   },
 };
@@ -165,6 +165,40 @@ const compareValues = (a, b, column) => {
   }
   if (column.numeric) return (a || 0) - (b || 0);
   return String(a || '').localeCompare(String(b || ''), 'ru');
+};
+
+// Значок ⓘ с всплывающей подсказкой
+const Hint = ({ text }) => {
+  const [pos, setPos] = useState(null);
+  if (!text) return null;
+
+  const show = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = 280;
+    const left = Math.min(Math.max(8, rect.left + rect.width / 2 - width / 2), window.innerWidth - width - 8);
+    const below = rect.bottom + 8;
+    setPos({ left, top: below, width });
+  };
+
+  return (
+    <span
+      className="hint"
+      tabIndex={0}
+      aria-label={text}
+      onMouseEnter={show}
+      onFocus={show}
+      onMouseLeave={() => setPos(null)}
+      onBlur={() => setPos(null)}
+      onClick={(e) => e.stopPropagation()}
+    >
+      i
+      {pos && (
+        <span className="hint-bubble" role="tooltip" style={{ left: pos.left, top: pos.top, width: pos.width }}>
+          {text}
+        </span>
+      )}
+    </span>
+  );
 };
 
 const ActivityTable = ({ rows, columns, sort, onSort }) => {
@@ -183,6 +217,7 @@ const ActivityTable = ({ rows, columns, sort, onSort }) => {
                 title="Сортировать"
               >
                 {col.header}
+                <Hint text={col.hint} />
                 <span className="sort-indicator">
                   {sort.key === col.accessor ? (sort.dir === 'asc' ? '▲' : '▼') : ''}
                 </span>
@@ -232,6 +267,7 @@ const KpiTile = ({ kpi, total, loading }) => {
         <div className="kpi-value">{loading ? <span className="skeleton" /> : kpi.value}</div>
         <div className="kpi-label">
           {kpi.label}
+          <Hint text={kpi.hint} />
           {!loading && percent !== null && ` · ${percent}%`}
         </div>
         {!loading && percent !== null && (
@@ -380,12 +416,33 @@ const ActivityDashboard = () => {
             {loading
               ? <div className="loader"><span className="spinner" /> Загрузка данных…</div>
               : <ActivityTable rows={visibleRows} columns={tab.columns} sort={sort} onSort={handleSort} />}
-            <p className="activity-note">
-              Заливка — данные проекта (компоненты, контракты, освоения, балансы, бюджеты), созданные или
-              измененные пользователями ОРП, в т.ч. через API. Последняя активность — последний вход или открытие проекта.
-              Входы и просмотры проектов и отчетов — по журналу (ведется с момента обновления системы).
-              Смены статуса — по истории изменений квартальных и месячных отчетов.
-            </p>
+            <details className="activity-help">
+              <summary>Как считаются показатели</summary>
+              <dl>
+                <dt>Заливка</dt>
+                <dd>
+                  Запись проекта, компонента, контракта, освоения, баланса или годового бюджета, созданная или
+                  измененная пользователем ОРП, в т.ч. через API. Правки куратора или администратора не считаются.
+                  Учитывается последний, кто изменял запись.
+                </dd>
+                <dt>Отчет</dt>
+                <dd>Квартальный или месячный отчет, отправленный на рассмотрение (по дате отправки).</dd>
+                <dt>Входы и просмотры</dt>
+                <dd>
+                  Берутся из журнала, который ведется с момента обновления системы, поэтому за более ранний период
+                  данных нет — там будут нули и «никогда».
+                </dd>
+                <dt>Смена статуса</dt>
+                <dd>По истории изменений квартальных и месячных отчетов: принят, отклонен, на доработку и т.п.</dd>
+                <dt>«Дней с …» и «Записей / Входов …»</dt>
+                <dd>
+                  Первое — регулярность (в скольких разных днях было действие), второе — объем (сколько всего).
+                  Например, 50 записей за 1 день: записей 50, дней 1.
+                </dd>
+                <dt>Периоды</dt>
+                <dd>«30 дн.» и «90 дн.» — считая от сегодняшней даты назад.</dd>
+              </dl>
+            </details>
           </Widget>
         </>
       )}
