@@ -637,14 +637,109 @@ tbody tr:hover {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-.activity-note {
-  margin: 16px 0 0;
-  padding: 12px 14px;
+/* Подсказки к колонкам и показателям */
+.hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  box-sizing: border-box;
+  border: 1px solid #b9c3d3;
+  border-radius: 50%;
+  background: #e6ebf3;
+  color: #4b5563;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 11px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: help;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.hint:hover,
+.hint:focus {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  outline: none;
+}
+
+.hint-bubble {
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+  font-style: normal;
+}
+
+.hint-bubble {
+  position: fixed;
+  z-index: 1000;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: #1f2937;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.25);
+  pointer-events: none;
+}
+
+.activity-help {
+  margin-top: 16px;
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-muted);
-  font-size: 12px;
-  line-height: 1.55;
-  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.activity-help summary {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.activity-help summary:hover {
+  color: var(--primary);
+}
+
+.activity-help dl {
+  display: grid;
+  grid-template-columns: minmax(140px, max-content) 1fr;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 4px 14px 14px;
+}
+
+.activity-help dt {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.activity-help dd {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .activity-help dl {
+    grid-template-columns: 1fr;
+  }
+  .activity-help dd {
+    margin-bottom: 6px;
+  }
 }
 
 @media (max-width: 1100px) {
