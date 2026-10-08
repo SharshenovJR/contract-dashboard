@@ -1,6 +1,6 @@
 const TableComponent = ({ data, columns }) => {
   if (!data || data.length === 0) {
-    return <p>Нет данных для отображения.</p>;
+    return <p className="empty-state">Нет данных для отображения.</p>;
   }
 
   return (

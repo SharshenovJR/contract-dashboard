@@ -31,7 +31,7 @@ const Pagination = ({ page, pageCount, onPageChange }) => {
       >Назад</button>
       {pages.map((p, idx) =>
         p === '...'
-          ? <span key={'ellipsis-' + idx} className="pagination-btn disabled" style={{ pointerEvents: 'none', background: '#fff', border: 'none' }}>...</span>
+          ? <span key={'ellipsis-' + idx} className="pagination-ellipsis">…</span>
           : <button
               key={p + '-' + idx}
               className={`pagination-btn${p === page ? ' active' : ''}`}
@@ -161,7 +161,7 @@ function Dashboard({
          {!hideHeader && (
            <header className="dashboard-header"><h1>{mainTitle}</h1></header>
          )}
-        <div style={{ padding: '20px' }}>Загрузка данных...</div>
+        <div className="loader"><span className="spinner" /> Загрузка данных…</div>
       </div>
     );
   }
@@ -172,7 +172,7 @@ function Dashboard({
          {!hideHeader && (
            <header className="dashboard-header"><h1>{mainTitle}</h1></header>
          )}
-        <div style={{ padding: '20px', color: 'red' }}>{error}</div>
+        <div className="error-box">{error}</div>
       </div>
     );
   }
@@ -203,7 +203,7 @@ function Dashboard({
         </header>
       )}
       <div className={`widgets-layout${category2 ? '' : ' widgets-layout--single'}`}>
-        <div>
+        <div className="widget-column">
             <Widget title={category1.title}>
                 <PieChartComponent data={pieData1} onSliceClick={handleSliceClick1} activeIndex={activePieIndex1}/>
             </Widget>
@@ -217,7 +217,7 @@ function Dashboard({
         </div>
 
         {category2 && (
-          <div>
+          <div className="widget-column">
               <Widget title={category2.title}>
                   <PieChartComponent data={pieData2} onSliceClick={handleSliceClick2} activeIndex={activePieIndex2} />
               </Widget>
