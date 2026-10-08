@@ -1,236 +1,288 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Widget from './Widget';
 import PieChartComponent from './PieChartComponent';
-import TableComponent from './TableComponent';
+import TableComponent, { cellValue } from './TableComponent';
 import { exportToExcel } from '../utils/exportUtils';
 import '../styles/App.css';
+
+const formatNumber = (value) => Number(value || 0).toLocaleString('ru-RU');
 
 const Pagination = ({ page, pageCount, onPageChange }) => {
   if (pageCount <= 1) return null;
   let pages = [];
   if (pageCount <= 7) {
     for (let i = 1; i <= pageCount; i++) pages.push(i);
+  } else if (page <= 4) {
+    pages = [1, 2, 3, 4, 5, '...', pageCount];
+  } else if (page >= pageCount - 3) {
+    pages = [1, '...', pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1, pageCount];
   } else {
-    if (page <= 4) {
-      pages = [1, 2, 3, 4, 5, '...', pageCount];
-    } else if (page >= pageCount - 3) {
-      pages = [1, '...', pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1, pageCount];
-    } else {
-      pages = [1, '...', page - 1, page, page + 1, '...', pageCount];
-    }
+    pages = [1, '...', page - 1, page, page + 1, '...', pageCount];
   }
-
-  pages = pages.filter((item, idx, arr) => item === '...' || arr.indexOf(item) === idx);
 
   return (
     <div className="pagination">
-      <button
-        className="pagination-btn"
-        onClick={() => onPageChange(page - 1)}
-        disabled={page === 1}
-      >Назад</button>
+      <button className="pagination-btn" onClick={() => onPageChange(page - 1)} disabled={page === 1}>‹ Назад</button>
       {pages.map((p, idx) =>
         p === '...'
           ? <span key={'ellipsis-' + idx} className="pagination-ellipsis">…</span>
           : <button
-              key={p + '-' + idx}
+              key={p}
               className={`pagination-btn${p === page ? ' active' : ''}`}
               onClick={() => onPageChange(p)}
               disabled={p === page}
             >{p}</button>
       )}
-      <button
-        className="pagination-btn"
-        onClick={() => onPageChange(page + 1)}
-        disabled={page === pageCount}
-      >Вперед</button>
+      <button className="pagination-btn" onClick={() => onPageChange(page + 1)} disabled={page === pageCount}>Вперед ›</button>
     </div>
   );
 };
 
+// Плитки категорий: служат и легендой диаграммы, и фильтром таблицы
+const CategoryTiles = ({ data, total, selected, onSelect }) => (
+  <div className="stat-tiles">
+    <button
+      className={`stat-tile stat-tile--total${selected ? '' : ' active'}`}
+      onClick={() => selected && onSelect(selected)}
+    >
+      <div className="stat-tile-label">Всего</div>
+      <div className="stat-tile-value">{formatNumber(total)}</div>
+      <div className="stat-tile-share"><span style={{ width: '100%' }} /></div>
+    </button>
+    {data.map((d, index) => {
+      const percent = total ? Math.round((d.value / total) * 100) : 0;
+      return (
+        <button
+          key={d.status}
+          className={`stat-tile${selected === d.status ? ' active' : ''}${selected && selected !== d.status ? ' dimmed' : ''}`}
+          style={{ '--tile-color': d.color }}
+          onClick={() => onSelect(d.status, index)}
+          title="Показать список"
+        >
+          <div className="stat-tile-label">
+            <span className="legend-color" style={{ backgroundColor: d.color }} />
+            {d.name}
+          </div>
+          <div className="stat-tile-value">
+            {formatNumber(d.value)}
+            <span className="stat-tile-percent">{percent}%</span>
+          </div>
+          <div className="stat-tile-share"><span style={{ width: `${percent}%` }} /></div>
+        </button>
+      );
+    })}
+  </div>
+);
+
+// Один блок статистики: плитки, диаграмма и таблица по выбранной категории
+const CategorySection = ({ category, loadTableOnInit, emptyTableOnDeselect, rowsPerPage }) => {
+  const [pieData, setPieData] = useState([]);
+  const [tableData, setTableData] = useState([]);
+  const [selected, setSelected] = useState(null);
+  // Категория, к которой относятся строки, уже показанные в таблице
+  const [tableCategory, setTableCategory] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const requestRef = useRef(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    Promise.all([
+      category.fetchPie(),
+      loadTableOnInit ? category.fetchTable(null) : Promise.resolve([]),
+    ])
+      .then(([pie, table]) => {
+        if (cancelled) return;
+        setPieData(pie || []);
+        setTableData(table || []);
+      })
+      .catch((err) => { if (!cancelled) setError(`Не удалось загрузить данные: ${err.message}`); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [category, loadTableOnInit]);
+
+  const loadTable = (categoryName) => {
+    const requestId = ++requestRef.current;
+    setTableLoading(true);
+    setError(null);
+    category.fetchTable(categoryName)
+      .then((data) => {
+        if (requestId !== requestRef.current) return;
+        setTableData(data || []);
+        setTableCategory(categoryName);
+      })
+      .catch((err) => { if (requestId === requestRef.current) setError(`Не удалось загрузить список: ${err.message}`); })
+      .finally(() => { if (requestId === requestRef.current) setTableLoading(false); });
+  };
+
+  const handleSelect = (categoryName, index) => {
+    setSearch('');
+    setPage(1);
+    if (selected === categoryName) {
+      setSelected(null);
+      setActiveIndex(null);
+      if (emptyTableOnDeselect) {
+        requestRef.current++;
+        setTableData([]);
+        setTableCategory(null);
+        setTableLoading(false);
+      } else {
+        loadTable(null);
+      }
+    } else {
+      setSelected(categoryName);
+      setActiveIndex(index ?? pieData.findIndex((d) => d.status === categoryName));
+      loadTable(categoryName);
+    }
+  };
+
+  const total = pieData.reduce((sum, d) => sum + (d.value || 0), 0);
+  const selectedEntry = pieData.find((d) => d.status === selected);
+  const tableEntry = pieData.find((d) => d.status === tableCategory);
+
+  const filteredRows = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return tableData;
+    return tableData.filter((row) => category.tableColumns.some((col) =>
+      String(cellValue(row, col) ?? '').toLowerCase().includes(query)));
+  }, [tableData, search, category.tableColumns]);
+
+  useEffect(() => { setPage(1); }, [filteredRows]);
+
+  const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
+  const pageRows = filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+
+  const handleExport = () => {
+    const rows = filteredRows.map((row) => Object.fromEntries(
+      category.tableColumns.map((col) => [col.accessor, cellValue(row, col)])
+    ));
+    const suffix = selectedEntry ? ` - ${selectedEntry.name}` : '';
+    exportToExcel(rows, category.tableColumns, `${category.title}${suffix}`);
+  };
+
+  if (loading) {
+    return <div className="stat-section"><div className="loader"><span className="spinner" /> Загрузка данных…</div></div>;
+  }
+
+  if (error && !pieData.length) {
+    return <div className="stat-section"><div className="error-box">{error}</div></div>;
+  }
+
+  const emptyText = search.trim()
+    ? 'Ничего не найдено.'
+    : (selected ? 'В этой категории нет записей.' : 'Выберите категорию на диаграмме или в плитках выше, чтобы увидеть список.');
+
+  return (
+    <section className="stat-section">
+      <h2 className="stat-section-title">{category.title}</h2>
+      <CategoryTiles data={pieData} total={total} selected={selected} onSelect={handleSelect} />
+
+      <div className="stat-grid">
+        <Widget title="Распределение">
+          <PieChartComponent data={pieData} onSliceClick={handleSelect} activeIndex={activeIndex} />
+          <p className="chart-hint">Нажмите на сектор, чтобы отфильтровать список</p>
+        </Widget>
+
+        <Widget
+          title={(
+            <>
+              Список
+              {selectedEntry && (
+                <span className="filter-chip" style={{ '--chip-color': selectedEntry.color }}>
+                  <span className="filter-chip-dot" />
+                  {selectedEntry.name}
+                  <button onClick={() => handleSelect(selected)} title="Сбросить фильтр" aria-label="Сбросить фильтр">×</button>
+                </span>
+              )}
+              {tableData.length > 0 && (
+                <span className="badge">
+                  {search.trim() ? `${filteredRows.length} из ${tableData.length}` : formatNumber(tableData.length)}
+                </span>
+              )}
+            </>
+          )}
+          headerActions={(
+            <>
+              <input
+                className="activity-search"
+                type="search"
+                placeholder="Поиск…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                disabled={!tableData.length}
+              />
+              <button
+                className="export-btn excel"
+                onClick={handleExport}
+                disabled={tableLoading || !filteredRows.length}
+                title="Экспорт в Excel"
+              >
+                <span className="export-icon">📊</span> Excel
+              </button>
+            </>
+          )}
+        >
+          {error && <div className="error-box" style={{ marginBottom: 12 }}>{error}</div>}
+          {/* Пока грузится новый список, старый остается на месте (без скачков высоты) */}
+          <div className={`table-area${tableLoading ? ' is-loading' : ''}`} aria-busy={tableLoading}>
+            <TableComponent
+              data={pageRows}
+              columns={category.tableColumns}
+              statusColor={tableEntry?.color}
+              emptyText={tableLoading ? '' : emptyText}
+            />
+            <Pagination page={page} pageCount={pageCount} onPageChange={setPage} />
+            {tableLoading && (
+              <div className="table-area-overlay"><span className="spinner" /> Загрузка списка…</div>
+            )}
+          </div>
+        </Widget>
+      </div>
+    </section>
+  );
+};
 
 function Dashboard({
-  mainTitle,
+  title,
+  subtitle,
   category1,
   category2 = null,
   loadTable1OnInit = true,
   loadTable2OnInit = true,
   emptyTableOnDeselect1 = false,
   emptyTableOnDeselect2 = false,
-  rowsPerPage: rowsPerPageProp = 10,
-  hideHeader = false,
+  rowsPerPage = 10,
 }) {
-  const [pieData1, setPieData1] = useState([]);
-  const [tableData1, setTableData1] = useState([]);
-  const [selectedCategory1, setSelectedCategory1] = useState(null);
-  const [activePieIndex1, setActivePieIndex1] = useState(null);
-  const [page1, setPage1] = useState(1);
-
-  const [pieData2, setPieData2] = useState([]);
-  const [tableData2, setTableData2] = useState([]);
-  const [selectedCategory2, setSelectedCategory2] = useState(null);
-  const [activePieIndex2, setActivePieIndex2] = useState(null);
-  const [page2, setPage2] = useState(1);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const rowsPerPage = rowsPerPageProp;
-
-  useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const pie1Promise = category1.fetchPie();
-        const table1Promise = loadTable1OnInit ? category1.fetchTable(null) : Promise.resolve([]);
-
-        const pie2Promise = category2 ? category2.fetchPie() : Promise.resolve([]);
-        const table2Promise = category2 ? (loadTable2OnInit ? category2.fetchTable(null) : Promise.resolve([])) : Promise.resolve([]);
-
-        const [res1Pie, res1Table, res2Pie, res2Table] = await Promise.all([
-          pie1Promise,
-          table1Promise,
-          pie2Promise,
-          table2Promise,
-        ]);
-
-        setPieData1(res1Pie || []);
-        setTableData1(res1Table || []);
-        if (category2) {
-          setPieData2(res2Pie || []);
-          setTableData2(res2Table || []);
-        }
-
-      } catch (err) {
-        console.error("Failed to fetch initial data:", err);
-        setError(`Не удалось загрузить данные: ${err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadInitialData();
-  }, [category1, category1.fetchPie, category1.fetchTable, category2, loadTable1OnInit, loadTable2OnInit]); // Зависимости на функции
-
-   const handleSliceClick1 = useCallback((categoryName, index) => {
-       if (selectedCategory1 === categoryName) {
-           setSelectedCategory1(null);
-           setActivePieIndex1(null);
-           if (emptyTableOnDeselect1) {
-             setTableData1([]);
-           } else {
-             category1.fetchTable(null).then(data => setTableData1(data || []));
-           }
-       } else {
-           setSelectedCategory1(categoryName);
-           setActivePieIndex1(index);
-           category1.fetchTable(categoryName).then(data => setTableData1(data || []));
-       }
-   }, [selectedCategory1, emptyTableOnDeselect1, category1]);
-
-   const handleSliceClick2 = useCallback((categoryName, index) => {
-       if (!category2) return;
-       if (selectedCategory2 === categoryName) {
-           setSelectedCategory2(null);
-           setActivePieIndex2(null);
-           if (emptyTableOnDeselect2) {
-             setTableData2([]);
-           } else {
-             category2.fetchTable(null).then(data => setTableData2(data || []));
-           }
-       } else {
-           setSelectedCategory2(categoryName);
-           setActivePieIndex2(index);
-           category2.fetchTable(categoryName).then(data => setTableData2(data || []));
-       }
-   }, [selectedCategory2, category2, emptyTableOnDeselect2]);
-
-  useEffect(() => { setPage1(1); }, [tableData1]);
-  useEffect(() => { setPage2(1); }, [tableData2]);
-
-  const table1PageCount = Math.ceil(tableData1.length / rowsPerPage);
-  const paginatedTable1Data = tableData1.slice((page1 - 1) * rowsPerPage, page1 * rowsPerPage);
-
-  const table2PageCount = Math.ceil(tableData2.length / rowsPerPage);
-  const paginatedTable2Data = tableData2.slice((page2 - 1) * rowsPerPage, page2 * rowsPerPage);
-
-  if (loading) {
-    return (
-      <div className="dashboard-container">
-         {!hideHeader && (
-           <header className="dashboard-header"><h1>{mainTitle}</h1></header>
-         )}
-        <div className="loader"><span className="spinner" /> Загрузка данных…</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-       <div className="dashboard-container">
-         {!hideHeader && (
-           <header className="dashboard-header"><h1>{mainTitle}</h1></header>
-         )}
-        <div className="error-box">{error}</div>
-      </div>
-    );
-  }
-  
-  const getTableTitle = (baseTitle, pieData, selectedCategory) => {
-    if (!selectedCategory) return `Статистика: ${baseTitle}`;
-    const categoryName = pieData.find(d => d.status === selectedCategory)?.name || selectedCategory;
-    return `Статистика: ${baseTitle} (${categoryName})`
-  }
-
-  const renderExportButtons = (data, columns, filename) => (
-    <div className="export-buttons">
-      <button 
-        className="export-btn excel" 
-        onClick={() => exportToExcel(data, columns, filename)}
-        title="Экспорт в Excel"
-      >
-        <span className="export-icon">📊</span> Экспорт в Excel
-      </button>
-    </div>
-  );
-
   return (
     <div className="dashboard-container">
-      {!hideHeader && (
-        <header className="dashboard-header">
-          <h1>{mainTitle}</h1>
-        </header>
-      )}
-      <div className={`widgets-layout${category2 ? '' : ' widgets-layout--single'}`}>
-        <div className="widget-column">
-            <Widget title={category1.title}>
-                <PieChartComponent data={pieData1} onSliceClick={handleSliceClick1} activeIndex={activePieIndex1}/>
-            </Widget>
-            <Widget 
-                title={getTableTitle(category1.title, pieData1, selectedCategory1)}
-                headerActions={renderExportButtons(tableData1, category1.tableColumns, category1.title)}
-            >
-                <TableComponent data={paginatedTable1Data} columns={category1.tableColumns} />
-                <Pagination page={page1} pageCount={table1PageCount} onPageChange={p => setPage1(p)} />
-            </Widget>
-        </div>
-
-        {category2 && (
-          <div className="widget-column">
-              <Widget title={category2.title}>
-                  <PieChartComponent data={pieData2} onSliceClick={handleSliceClick2} activeIndex={activePieIndex2} />
-              </Widget>
-               <Widget 
-                  title={getTableTitle(category2.title, pieData2, selectedCategory2)}
-                  headerActions={renderExportButtons(tableData2, category2.tableColumns, category2.title)}
-               >
-                  <TableComponent data={paginatedTable2Data} columns={category2.tableColumns} />
-                  <Pagination page={page2} pageCount={table2PageCount} onPageChange={p => setPage2(p)} />
-              </Widget>
+      {title && (
+        <div className="activity-toolbar">
+          <div>
+            <h2 className="activity-title">{title}</h2>
+            {subtitle && <p className="activity-subtitle">{subtitle}</p>}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      <CategorySection
+        category={category1}
+        loadTableOnInit={loadTable1OnInit}
+        emptyTableOnDeselect={emptyTableOnDeselect1}
+        rowsPerPage={rowsPerPage}
+      />
+      {category2 && (
+        <CategorySection
+          category={category2}
+          loadTableOnInit={loadTable2OnInit}
+          emptyTableOnDeselect={emptyTableOnDeselect2}
+          rowsPerPage={rowsPerPage}
+        />
+      )}
     </div>
   );
 }
