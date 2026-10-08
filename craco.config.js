@@ -14,6 +14,7 @@ module.exports = {
         main: mainEntry,
         project: path.resolve(__dirname, 'src/Project.js'),
         contract: path.resolve(__dirname, 'src/Contract.js'),
+        activity: path.resolve(__dirname, 'src/Activity.js'),
       };
 
       if (config.mode === 'production') {
@@ -52,6 +53,13 @@ module.exports = {
           chunks: ['contract'],
           filename: 'contract.html',
           template: path.resolve(__dirname, 'public/contract.html'),
+        }));
+
+        config.plugins.push(new HtmlWebpackPluginCtor({
+          inject: true,
+          chunks: ['activity'],
+          filename: 'activity.html',
+          template: path.resolve(__dirname, 'public/activity.html'),
         }));
       }
 
