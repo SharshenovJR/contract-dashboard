@@ -1,4 +1,14 @@
+import {
+  mockOrpActivity,
+  mockProjectActivity,
+  mockCuratorActivity,
+  mockDailyActivity,
+} from './activityMock';
+
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+// Мониторинг активности на демонстрационных данных вместо API
+export const ACTIVITY_MOCK = process.env.REACT_APP_ACTIVITY_MOCK === 'true';
 const DATE_STATS_PIE_URL = `${API_BASE_URL}/contract-stats/date/pie`;
 const DATE_STATS_TABLE_URL = `${API_BASE_URL}/contract-stats/date/table`;
 const STATUS_STATS_PIE_URL = `${API_BASE_URL}/contract-stats/status/pie`;
@@ -9,6 +19,7 @@ const PROJECT_STATS_TABLE_URL = `${API_BASE_URL}/project-stats/date/table`;
 const ACTIVITY_ORP_URL = `${API_BASE_URL}/activity-stats/orp`;
 const ACTIVITY_PROJECTS_URL = `${API_BASE_URL}/activity-stats/projects`;
 const ACTIVITY_CURATORS_URL = `${API_BASE_URL}/activity-stats/curators`;
+const ACTIVITY_DAILY_URL = `${API_BASE_URL}/activity-stats/daily`;
 
 
 const fetchData = async (url, options) => {
@@ -70,16 +81,22 @@ export const fetchProjectDateStatsTable = async (category) => {
   return fetchData(url);
 };
 
-const fetchPrivateData = (url) => fetchData(url, { credentials: 'include' });
-
 export const fetchOrpActivity = async () => {
-  return fetchPrivateData(ACTIVITY_ORP_URL);
+  if (ACTIVITY_MOCK) return mockOrpActivity();
+  return fetchData(ACTIVITY_ORP_URL);
 };
 
 export const fetchProjectActivity = async () => {
-  return fetchPrivateData(ACTIVITY_PROJECTS_URL);
+  if (ACTIVITY_MOCK) return mockProjectActivity();
+  return fetchData(ACTIVITY_PROJECTS_URL);
 };
 
 export const fetchCuratorActivity = async () => {
-  return fetchPrivateData(ACTIVITY_CURATORS_URL);
+  if (ACTIVITY_MOCK) return mockCuratorActivity();
+  return fetchData(ACTIVITY_CURATORS_URL);
+};
+
+export const fetchDailyActivity = async (days) => {
+  if (ACTIVITY_MOCK) return mockDailyActivity(days);
+  return fetchData(`${ACTIVITY_DAILY_URL}?days=${encodeURIComponent(days)}`);
 };
