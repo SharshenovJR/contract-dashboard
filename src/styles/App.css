@@ -747,6 +747,13 @@ td.text-success {
   line-height: 1.35;
 }
 
+.kpi-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
 .kpi-share {
   margin-top: 10px;
   height: 4px;
@@ -771,16 +778,52 @@ td.text-success {
   overflow: auto;
 }
 
-.activity-table th {
+.activity-table thead {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
+}
+
+/* Компактные ячейки: таблицы занимают ширину по содержимому */
+.activity-table table {
+  width: auto;
+  min-width: 100%;
+}
+
+.activity-table th,
+.activity-table td {
+  padding: 8px 10px;
+}
+
+.activity-table th.group-header {
+  text-align: center;
+  white-space: nowrap;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.activity-table th.row-num,
+.activity-table td.row-num {
+  width: 1%;
+  padding-right: 6px;
+  text-align: right;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .activity-table th.sortable {
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+}
+
+/* Числовые колонки узкие: заголовок переносится, а не растягивает колонку */
+.activity-table th.sortable.numeric {
+  width: 1%;
+  min-width: 64px;
+  max-width: 110px;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 .activity-table th.sortable:hover {
@@ -797,8 +840,16 @@ td.text-success {
   font-variant-numeric: tabular-nums;
 }
 
-.activity-table td.wide {
-  min-width: 260px;
+.cell-text {
+  display: block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-table td.wide .cell-text {
+  max-width: 280px;
 }
 
 .activity-table td.first-col {
@@ -835,29 +886,153 @@ td.text-success {
   color: var(--text-muted);
 }
 
-.freshness {
+/* Динамика по дням */
+.activity-dashboard > .widget + .widget {
+  margin-top: 24px;
+}
+
+.period-switch {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  background: var(--neutral-soft);
+}
+
+.period-switch-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.period-switch-btn:hover {
+  color: var(--text);
+}
+
+.period-switch-btn.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
+
+.trend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: 24px;
+}
+
+.trend-chart {
+  min-width: 0;
+}
+
+.trend-chart-header {
+  margin-bottom: 8px;
+}
+
+.trend-chart-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.trend-chart-hint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.trend-legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.trend-legend-item {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  width: fit-content;
-  padding: 2px 9px;
-  border-radius: 999px;
+  gap: 6px;
+}
+
+.trend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.trend-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-hover);
+  padding: 8px 10px;
   font-size: 12px;
+  color: var(--text);
+}
+
+.trend-tooltip-date {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.trend-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trend-tooltip-name {
+  color: var(--text-secondary);
+}
+
+.trend-tooltip-value {
+  margin-left: auto;
+  padding-left: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Активные и пассивные — две таблицы: рядом (ОРП) или друг под другом */
+.activity-split {
+  display: grid;
+  gap: 20px;
+}
+
+.activity-split--columns {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr));
+  align-items: start;
+}
+
+.activity-split-part {
+  min-width: 0;
+}
+
+.activity-split-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 14px;
   font-weight: 600;
 }
 
-.freshness::before {
+.activity-split-title::before {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: currentColor;
 }
 
-.freshness--ok { background: var(--success-soft); color: var(--success); }
-.freshness--warn { background: var(--warning-soft); color: var(--warning); }
-.freshness--bad { background: var(--danger-soft); color: var(--danger); }
-.freshness--never { background: var(--neutral-soft); color: var(--text-muted); }
+.activity-split-title--good::before { background: var(--success); }
+.activity-split-title--alert::before { background: var(--danger); }
 
 .activity-legend {
   display: flex;
@@ -1045,4 +1220,791 @@ td.text-success {
   padding-top: 56px;
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+/* =====================================================================
+   Мониторинг активности — оформление страницы
+   ===================================================================== */
+.activity-dashboard {
+  --primary: #1f4e9c;
+  --primary-strong: #163a75;
+  --primary-soft: #e9f0fb;
+  --ink: #14213a;
+  --text: #1c2940;
+  --text-secondary: #46566f;
+  --text-muted: #7b879b;
+  --border: #e3e8f0;
+  --border-strong: #cfd7e3;
+  --surface-muted: #f6f8fb;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(20, 33, 58, 0.04), 0 6px 20px rgba(20, 33, 58, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: var(--text);
+}
+
+.activity-dashboard > .widget + .widget {
+  margin-top: 0;
+}
+
+/* Шапка */
+.ad-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px 24px;
+  padding: 28px 32px 0;
+  border-radius: var(--radius);
+  color: #fff;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.12) 0, rgba(255, 255, 255, 0) 45%),
+    linear-gradient(135deg, #10295a 0%, #1a438a 55%, #2459ad 100%);
+  box-shadow: 0 10px 30px rgba(16, 41, 90, 0.25);
+  overflow: hidden;
+}
+
+.ad-hero::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: linear-gradient(90deg, #e8b931, #f3d36b 50%, #e8b931);
+  opacity: 0.9;
+}
+
+.ad-hero-main {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.ad-hero-mark {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #f3d36b;
+}
+
+.ad-hero-eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ad-hero-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.ad-hero-subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.ad-hero-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.ad-demo-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #3d2c00;
+  background: #f3d36b;
+}
+
+.ad-hero-stamp {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
+}
+
+.ad-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ad-refresh:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.ad-refresh:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ad-refresh:focus-visible,
+.ad-tab:focus-visible {
+  outline: 2px solid #f3d36b;
+  outline-offset: 2px;
+}
+
+/* Вкладки — нижняя кромка шапки */
+.ad-tabs {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 4px;
+  margin: 4px -8px 0;
+  overflow-x: auto;
+}
+
+.ad-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px 14px;
+  border: none;
+  border-radius: 10px 10px 0 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ad-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ad-tab.active {
+  color: var(--primary-strong);
+  background: var(--bg);
+}
+
+.ad-tab-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.ad-tab.active .ad-tab-count {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* Плитки показателей */
+.activity-dashboard .kpi-row {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+
+.activity-dashboard .kpi-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 18px 20px 20px;
+  border-top: 3px solid var(--primary);
+}
+
+.activity-dashboard .kpi-tile--good { border-top-color: var(--success); }
+.activity-dashboard .kpi-tile--alert { border-top-color: var(--danger); }
+
+.kpi-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+}
+
+.activity-dashboard .kpi-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  font-size: 0;
+}
+
+.activity-dashboard .kpi-label {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.activity-dashboard .kpi-head .hint {
+  margin-left: auto;
+}
+
+.activity-dashboard .kpi-value {
+  margin-top: 14px;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.kpi-percent {
+  margin-left: 2px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.activity-dashboard .kpi-tile--alert .kpi-value {
+  color: var(--danger);
+}
+
+.activity-dashboard .kpi-count {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.activity-dashboard .kpi-share {
+  height: 6px;
+  margin-top: 14px;
+  border-radius: 3px;
+}
+
+.activity-dashboard .kpi-share > span {
+  border-radius: 3px;
+}
+
+.activity-dashboard .skeleton {
+  display: inline-block;
+  width: 72px;
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #edf1f7 25%, #f6f8fb 50%, #edf1f7 75%);
+  background-size: 200% 100%;
+  animation: ad-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes ad-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* Карточки разделов */
+.activity-dashboard .widget-header {
+  padding: 16px 22px;
+}
+
+.activity-dashboard .widget-header h3 {
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.activity-dashboard .widget-content {
+  padding: 20px 22px 22px;
+}
+
+.activity-dashboard .widget-header-actions .activity-legend {
+  margin: 0;
+}
+
+.activity-legend-label {
+  font-weight: 600;
+}
+
+/* Активные / пассивные */
+.ad-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ad-panel-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 0 2px 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+.ad-panel--good .ad-panel-header { border-bottom-color: var(--success); }
+.ad-panel--alert .ad-panel-header { border-bottom-color: var(--danger); }
+
+.ad-panel-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ad-panel-count {
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.ad-panel--good .ad-panel-count { background: var(--success-soft); color: var(--success); }
+.ad-panel--alert .ad-panel-count { background: var(--danger-soft); color: var(--danger); }
+
+.ad-panel-note {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.ad-panel .empty-state {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+/* Таблицы */
+.activity-dashboard .activity-table {
+  border-radius: 10px;
+}
+
+.activity-dashboard .activity-table th {
+  background: var(--surface-muted);
+  color: #5a6880;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.activity-dashboard .activity-table th.sortable:hover {
+  background: #edf2f9;
+}
+
+.activity-dashboard .activity-table td {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.activity-dashboard .activity-table td.first-col {
+  color: var(--ink);
+}
+
+.activity-dashboard tbody tr:nth-child(even) {
+  background: #fafbfd;
+}
+
+.activity-dashboard tbody tr:hover {
+  background: var(--primary-soft);
+}
+
+.activity-dashboard .cell-text {
+  max-width: 170px;
+}
+
+.activity-dashboard .activity-table td.wide .cell-text {
+  max-width: 260px;
+}
+
+.activity-dashboard .activity-split--columns .cell-text {
+  max-width: 200px;
+}
+
+.activity-dashboard .date-cell-value {
+  font-size: 11.5px;
+}
+
+/* Две таблицы рядом, только если обе помещаются целиком */
+.activity-dashboard .activity-split--columns {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 600px), 1fr));
+  gap: 28px;
+}
+
+/* Динамика */
+.activity-dashboard .period-switch {
+  background: #edf1f7;
+}
+
+.activity-dashboard .trend-grid {
+  gap: 28px;
+}
+
+.activity-dashboard .trend-chart {
+  padding: 16px 18px 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fbfcfe 0%, #fff 60%);
+}
+
+/* Справка */
+.activity-dashboard .activity-help {
+  margin-top: 22px;
+}
+
+/* Подвал */
+.ad-footer {
+  margin: 0;
+  padding: 0 4px 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .ad-hero {
+    grid-template-columns: 1fr;
+    padding: 22px 20px 0;
+  }
+
+  .ad-hero-side {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ad-hero-title {
+    font-size: 22px;
+  }
+}
+
+.activity-dashboard .kpi-tile {
+  align-items: stretch;
+}
+
+/* Заголовки колонок переносятся, чтобы таблицы были узкими */
+.activity-dashboard .activity-table th.sortable {
+  white-space: normal;
+  line-height: 1.3;
+  vertical-align: bottom;
+}
+
+.activity-dashboard .activity-split--columns .activity-table th,
+.activity-dashboard .activity-split--columns .activity-table td {
+  padding: 8px;
+}
+
+.activity-dashboard .activity-split--columns .cell-text {
+  max-width: 170px;
+}
+
+/* Блоки не растягиваются по ширине таблиц: таблица прокручивается внутри своей рамки */
+.activity-dashboard > *,
+.activity-dashboard .widget {
+  min-width: 0;
+}
+
+.activity-dashboard .activity-split:not(.activity-split--columns) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.activity-dashboard .activity-table th,
+.activity-dashboard .activity-table td {
+  padding: 8px;
+}
+
+.activity-dashboard .activity-table th.sortable.numeric {
+  min-width: 52px;
+}
+
+.activity-dashboard .kpi-row {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+@media (max-width: 600px) {
+  .activity-dashboard.dashboard-container {
+    padding: 12px;
+    gap: 16px;
+  }
+
+  .ad-hero-side {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .activity-dashboard .widget-header {
+    flex-wrap: wrap;
+  }
+}
+
+/* Все надписи — в одну строку; не помещается — многоточие, полный текст при наведении */
+.one-line {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-dashboard .widget-header h3 {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.activity-dashboard .widget-header {
+  flex-wrap: wrap;
+}
+
+.ad-hero-text {
+  min-width: 0;
+}
+
+.activity-dashboard .kpi-head .kpi-label {
+  flex: 0 1 auto;
+}
+
+.ad-panel-header {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.ad-panel-header .ad-panel-title,
+.ad-panel-header .ad-panel-count {
+  flex-shrink: 0;
+}
+
+.ad-panel-header .ad-panel-note {
+  flex: 0 1 auto;
+}
+
+/* Заголовки колонок в одну строку */
+.activity-dashboard .activity-table th.sortable,
+.activity-dashboard .activity-table th.sortable.numeric {
+  white-space: nowrap;
+  vertical-align: middle;
+  max-width: none;
+}
+
+.th-inner {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+th.numeric .th-inner {
+  justify-content: flex-end;
+}
+
+.th-label {
+  flex: 0 1 auto;
+  max-width: 150px;
+}
+
+th.numeric .th-label {
+  max-width: 92px;
+}
+
+th.date .th-label {
+  max-width: 120px;
+}
+
+.activity-dashboard .activity-table th.group-header .one-line {
+  max-width: 180px;
+  margin: 0 auto;
+}
+
+.th-inner .hint {
+  margin-left: 4px;
+}
+
+.th-inner .sort-indicator {
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
+/* Дата в одну строку */
+.activity-dashboard .date-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.activity-dashboard .date-cell-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trend-chart-header .one-line {
+  max-width: 100%;
+}
+
+/* Колонки делят ширину таблицы пропорционально (см. ColGroup), текст обрезается по ширине колонки */
+.activity-dashboard .activity-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.activity-dashboard .activity-table th,
+.activity-dashboard .activity-table td {
+  overflow: hidden;
+}
+
+.activity-dashboard .cell-text,
+.activity-dashboard .activity-table td.wide .cell-text,
+.activity-dashboard .activity-split--columns .cell-text,
+.th-label,
+th.numeric .th-label,
+th.date .th-label,
+.activity-dashboard .activity-table th.group-header .one-line {
+  max-width: 100%;
+}
+
+.activity-dashboard .activity-table th.row-num,
+.activity-dashboard .activity-table td.row-num {
+  width: auto;
+}
+
+.activity-dashboard .activity-table th.sortable.numeric {
+  min-width: 0;
+}
+
+/* Заголовки колонок обычным регистром — уже и читаются легче */
+.activity-dashboard .activity-table th {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.activity-dashboard .date-cell {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ширина колонок по содержимому: заголовки целиком, длинный текст в ячейках — с многоточием */
+.activity-dashboard .activity-table table {
+  table-layout: auto;
+  width: 100%;
+}
+
+.activity-dashboard .activity-table th .th-label {
+  white-space: nowrap;
+  overflow: visible;
+  max-width: none;
+}
+
+.activity-dashboard .cell-text {
+  max-width: 220px;
+}
+
+.activity-dashboard .activity-table td.wide .cell-text {
+  max-width: 280px;
+}
+
+/* =====================================================================
+   Цвета как на портале AidStat (aidStatFront, src/styles/theme.ts)
+   ===================================================================== */
+body:has(.activity-dashboard) {
+  background-color: #f5f5f5;
+}
+
+.activity-dashboard {
+  --bg: #f5f5f5;
+  --primary: #0b4678;
+  --primary-strong: #083a64;
+  --primary-hover: #005faf;
+  --primary-soft: #e7eef5;
+  --success: #519c66;
+  --success-soft: #eaf4ed;
+  --danger: #cc5f5f;
+  --danger-soft: #faeded;
+  --warning: #b86e00;
+  --warning-soft: #fff4e0;
+  --ink: #1f2937;
+  --text: #333333;
+  --text-secondary: #45464e;
+  --text-muted: #6b7280;
+  --border: #e4e7ec;
+  --border-strong: #c2c6ca;
+  --surface-muted: #f1f3f9;
+  --neutral-soft: #f1f3f9;
+  --radius: 6px;
+  --radius-sm: 6px;
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.activity-dashboard .widget,
+.activity-dashboard .kpi-tile {
+  border-color: var(--border-strong);
+}
+
+.ad-hero {
+  background: linear-gradient(135deg, #0b4678 0%, #0d5291 60%, #005faf 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ad-hero::after {
+  background: #fec44f;
+}
+
+.ad-hero-mark {
+  color: #fec44f;
+}
+
+.ad-demo-pill {
+  background: #fec44f;
+}
+
+.ad-tab.active {
+  color: var(--primary);
+}
+
+.ad-refresh:focus-visible,
+.ad-tab:focus-visible {
+  outline-color: #fec44f;
+}
+
+.activity-dashboard .widget-header h3::before {
+  background: var(--primary);
+}
+
+.activity-dashboard .period-switch {
+  background: var(--neutral-soft);
+}
+
+.activity-dashboard .period-switch-btn.active {
+  color: var(--primary);
+}
+
+.activity-dashboard .activity-table th.sorted,
+.activity-dashboard .sort-indicator {
+  color: var(--primary);
+}
+
+.activity-dashboard .hint:hover,
+.activity-dashboard .hint:focus {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.activity-dashboard tbody tr:hover {
+  background: var(--primary-soft);
+}
+
+/* Обрезка длинных названий в ячейках (перебивает общее правило max-width: 100%) */
+.activity-dashboard .activity-table td .cell-text {
+  max-width: 220px;
+}
+
+.activity-dashboard .activity-table td.wide .cell-text {
+  max-width: 280px;
 }
